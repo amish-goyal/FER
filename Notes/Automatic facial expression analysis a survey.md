@@ -34,3 +34,31 @@ There are two main methodological approaches of how to measure the three charact
 * _message judgment_-based approaches: directly associate specific facial patters with mental activities
 * _sign vehicle_-based approaches: represent facial actions in a coded way, prior to eventual interpretation attempts.
 
+###Judgment-based approaches
+
+Most automatic facial expression analysis approaches attemp to directly map facial expressions into one of the 6 basic emotion classes.
+
+###Sign-based appraches
+
+-
+
+##Reliability of ground truth coding
+
+?
+
+#Automatic facial expression analysis
+
+##Face acquisition
+
+* Includes an automatic face detector.
+There are two main types of facial analysis methods: the ones which need the exact posotion of the face, and the ones which work with coarse location of the face.
+
+It is always a good idea to normalize faces prior to their analysis:
+  * _Pose_: the angle and distance at which a given face is being observed.
+  Pose variations occur due to *scale changes* as well as *in-plane* and *out-of-plane* rotation of faces.
+  obviously the out-of-plane rotation is the hard one to fix.
+
+  * _Illumination_: Common approach: filter the image with Gabor wavelets.
+  There are problems with partly lighted faces. This is solved for face recognition by Belhumeur, but not yet sufficiently for facial expression analysis.
+
+As long as extracted feature parameters are normalized prior to their classifivation, _face normalization_ is _not mandatory_. Appearance-based model and local motion model approaches have dealt with significant out-of-plane rotations without relying on face normalization.
