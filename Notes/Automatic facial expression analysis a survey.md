@@ -40,7 +40,7 @@ Most automatic facial expression analysis approaches attemp to directly map faci
 
 ###Sign-based appraches
 
--
+?
 
 ##Reliability of ground truth coding
 
