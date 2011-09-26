@@ -62,3 +62,6 @@ It is always a good idea to normalize faces prior to their analysis:
   There are problems with partly lighted faces. This is solved for face recognition by Belhumeur, but not yet sufficiently for facial expression analysis.
 
 As long as extracted feature parameters are normalized prior to their classifivation, _face normalization_ is _not mandatory_. Appearance-based model and local motion model approaches have dealt with significant out-of-plane rotations without relying on face normalization.
+
+##Feature extraction and representation
+
