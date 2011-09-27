@@ -74,10 +74,10 @@ As long as extracted feature parameters are normalized prior to their classifiva
 * _local_: focusing on facial features or areas that are prone to change with facial expressions.
 
 Two types of facial features:
-* _Intransient_: are always present in the face, may be deformed due to facial expressions.
 
+* _Intransient_:
+    * are always present in the face, may be deformed due to facial expressions.
     * the eyes, eyebrows, mouth, tissue texture, facial hair
 
-* _Transient_: 
-
+* _Transient_:
     * different kind of weinkles and bulges. especially regions surrounding the mouth and the eyes.
