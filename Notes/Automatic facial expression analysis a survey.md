@@ -65,3 +65,17 @@ As long as extracted feature parameters are normalized prior to their classifiva
 
 ##Feature extraction and representation
 
+* whether the focus on motion/deformation of faces and facial features.
+* whether they act locally or holistically
+
+### Local vs. Holistic approaches
+
+* _holistic_: the face processed as a whole
+* _local_: focusing on facial features or areas that are prone to change with facial expressions.
+
+Two types of facial features:
+* _Intransient_: are always present in the face, may be deformed due to facial expressions.
+    * the eyes, eyebrows, mouth, tissue texture, facial hair
+
+* _Transient_: 
+    * different kind of weinkles and bulges. especially regions surrounding the mouth and the eyes.
