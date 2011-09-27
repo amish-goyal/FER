@@ -75,7 +75,9 @@ As long as extracted feature parameters are normalized prior to their classifiva
 
 Two types of facial features:
 * _Intransient_: are always present in the face, may be deformed due to facial expressions.
+
     * the eyes, eyebrows, mouth, tissue texture, facial hair
 
 * _Transient_: 
+
     * different kind of weinkles and bulges. especially regions surrounding the mouth and the eyes.
