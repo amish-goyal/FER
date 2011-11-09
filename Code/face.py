@@ -1,8 +1,21 @@
 import cv
 
+
 face_cascade = "haarcascades/haarcascade_frontalface_alt.xml"
 debug = False
+show_gabor = False
+
+if show_gabor:
+	import gabor
+
 count = 1
+
+#gabor filter parameters
+kernel_var = 50
+gabor_pulsation = 5
+gabor_phase = 0
+gabor_psi = 90
+
 
 def main():
 	hc = cv.Load(face_cascade)
@@ -21,7 +34,7 @@ def main():
 
 	while True:
 		img = cv.QueryFrame(capture)
-
+		
 		returned = handel_camera_image(img, hc)
 
 		if returned == None:
@@ -31,6 +44,24 @@ def main():
 
 			cv.ShowImage("camera", img_f)
 			cv.ShowImage("normalized", img_r)
+
+			if show_gabor:
+				gabor_phase = 0
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor1", img_g_mag)
+
+				gabor_phase = 45
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor2", img_g_mag)
+
+				gabor_phase = 90
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor3", img_g_mag)
+
+				gabor_phase = 135
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor4", img_g_mag)
+
 
 		key_pressed = cv.WaitKey(1)
 		# print "key pressed: " + str(key_pressed)
@@ -52,8 +83,7 @@ def main():
 		elif (key_pressed == 55):
 			save_img("surprise", img, img_r)
 
-	cv.DestroyWindow("camera")
-	cv.DestroyWindow("normalized")
+	cv.DestroyAllWindows()
 
 
 def save_img(img_type, img_o, img_f):
