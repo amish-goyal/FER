@@ -11,7 +11,7 @@ def main():
 
 	print "Press ESC to exit"
 	print "capture image with keys 1 to 7"
-	print "1 : Neutral"
+	print "1: Neutral"
 	print "2: anger"
 	print "3: disgust"
 	print "4: fear"
