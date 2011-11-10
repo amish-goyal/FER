@@ -16,6 +16,7 @@ pos_w = 5
 pos_phase = 0
 pos_psi = 90
 
+# returns (dest_mag, dest)
 def Process(image, pos_var, pos_w, pos_phase, pos_psi):
 	global kernel_size
 	if kernel_size%2==0:
@@ -27,7 +28,13 @@ def Process(image, pos_var, pos_w, pos_phase, pos_psi):
 	src = cv.CreateImage((image.width,image.height),cv.IPL_DEPTH_8U,1)
 	src_f = cv.CreateImage((image.width,image.height),cv.IPL_DEPTH_32F,1)
 
-	src = image #cv.CvtColor(image,src,cv.CV_BGR2GRAY) #no conversion is needed
+	# src = image #cv.CvtColor(image,src,cv.CV_BGR2GRAY) #no conversion is needed
+	if cv.GetElemType(image) == cv.CV_8UC3:
+		cv.CvtColor(image,src,cv.CV_BGR2GRAY)
+	else:
+		src = image
+	
+
 	cv.ConvertScale(src,src_f,1.0/255,0)
 	dest = cv.CloneImage(src_f)
 	dest_mag = cv.CloneImage(src_f)

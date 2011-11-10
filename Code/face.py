@@ -3,7 +3,7 @@ import cv
 
 face_cascade = "haarcascades/haarcascade_frontalface_alt.xml"
 debug = False
-show_gabor = False
+show_gabor = True
 
 if show_gabor:
 	import gabor
@@ -46,19 +46,20 @@ def main():
 			cv.ShowImage("normalized", img_r)
 
 			if show_gabor:
-				gabor_phase = 0
+				gabor_phase = 100
+				gabor_pulsation = 5
 				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 				cv.ShowImage("Gabor1", img_g_mag)
 
-				gabor_phase = 45
+				gabor_pulsation = 2
 				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 				cv.ShowImage("Gabor2", img_g_mag)
 
-				gabor_phase = 90
+				gabor_pulsation = 8
 				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 				cv.ShowImage("Gabor3", img_g_mag)
 
-				gabor_phase = 135
+				gabor_pulsation = 10
 				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 				cv.ShowImage("Gabor4", img_g_mag)
 
