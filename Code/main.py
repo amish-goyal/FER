@@ -4,6 +4,7 @@ import svmutil
 import gabor
 import glob
 import face
+import operator
 
 def main():
 	
@@ -59,16 +60,9 @@ def new_test():
 				(val, val_2, surprise_label) = svmutil.svm_predict([1] ,predict_input_data, surprise_model)
 				(val, val_2, anger_label) = svmutil.svm_predict([1] ,predict_input_data, anger_model)
 
-				happy_val = happy_label[0][0]
-				surprise_val = surprise_label[0][0]
-				anger_val = anger_label[0][0]
-
-				if happy_val >= surprise_val and happy_val >= anger_val:
-					print "happy: "
-				if surprise_val >= happy_val and surprise_val >= anger_val:
-					print "surprise: "
-				if anger_val >= surprise_val and anger_val >= happy_val:
-					print "anger: "
+				results = {'happy': happy_label[0][0], 'surprise': surprise_label[0][0], 'anger': anger_label[0][0]}
+				sorted_results = sorted(results.iteritems(), key=operator.itemgetter(1))
+				print sorted_results[len(sorted_results)-1][0]
 
 			print "---------------------"
 
