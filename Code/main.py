@@ -7,14 +7,14 @@ import face
 
 def main():
 	
-	img_kind = "anger"
-	svm_params = "-t 2"
-	expample_make_happy_model(img_kind, svm_params)
+	img_kind = "surprise"
+	# svm_params = "-t 0 -c 10"
+	# expample_make_model(img_kind, svm_params)
 
-	# test_happy_model()
+	test_model(img_kind)
 	
-def test_happy_model():
-	model = svmutil.svm_load_model('happy.model')
+def test_model(img_kind):
+	model = svmutil.svm_load_model(img_kind + '.model')
 	print "Finished Loading Model"
 
 	face_cascade = "haarcascades/haarcascade_frontalface_alt.xml"
@@ -33,7 +33,7 @@ def test_happy_model():
 			print "We have a face"
 			(img_o, img_face) = returned
 
-			img_face = cv.LoadImageM('data/f_happy_3.jpg');
+			# img_face = cv.LoadImageM('data/f_surprise_3.jpg');
 
 			test_data = get_image_features(img_face)
 			
@@ -58,7 +58,7 @@ def test_happy_model():
 
 # img_kind = "happy"
 # svm_params = "-t 0 -c 10"
-def expample_make_happy_model(img_kind, svm_params):
+def expample_make_model(img_kind, svm_params):
 	problem = build_problem(img_kind)
 	print "Prob built"
 
