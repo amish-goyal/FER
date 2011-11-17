@@ -5,16 +5,59 @@ import gabor
 import glob
 import face
 import operator
+import os.path
 
 def main():
 	
 	img_kind = "surprise"
 	# svm_params = "-t 0 -c 10"
-	# expample_make_model(img_kind, svm_params)
+	# example_make_model(img_kind, svm_params)
 
 	# test_model(img_kind)
 
-	new_test()
+	# new_test()
+
+	data_gen(img_kind)
+
+def data_gen(img_kind):
+	subdir = "data/"
+	extension = '.data'
+	file_path = subdir + img_kind + extension
+	output_file = open(file_path, 'w+')
+
+	the_ones = glob.glob(subdir + "f_" + img_kind + "*.jpg")
+	all_of_them = glob.glob(subdir + "f_*_*.jpg")
+	the_others = []
+
+	for x in all_of_them:
+		if the_ones.count(x) < 1:
+			the_others.append(x)
+	
+	for x in the_ones:
+		img_features = get_image_features(cv.LoadImageM(x))
+		class_label = 1
+		#write label in a new line
+		output_file.write(str(class_label))
+		#write features one by one and increment the index
+		for i in xrange(1,len(img_features)):
+			output_file.write(' ' + str(i) + ':' + str(img_features[i-1]))
+		#write newline
+		output_file.write("\n")
+		print x
+	
+	for x in the_others:
+		img_features = get_image_features(cv.LoadImageM(x))
+		class_label = -1
+		#write label in a new line
+		output_file.write(str(class_label))
+		#write features one by one and increment the index
+		for i in xrange(1,len(img_features)):
+			output_file.write(' ' + str(i) + ':' + str(img_features[i-1]))
+		#write newline
+		output_file.write("\n")
+		print x
+	
+	output_file.close()
 
 def new_test():
 	# load all the models
@@ -111,7 +154,7 @@ def test_model(img_kind):
 
 # img_kind = "happy"
 # svm_params = "-t 0 -c 10"
-def expample_make_model(img_kind, svm_params):
+def example_make_model(img_kind, svm_params):
 	problem = build_problem(img_kind)
 	print "Prob built"
 
@@ -135,6 +178,8 @@ def get_features(img):
 	
 	return features
 
+# gets an opencv image
+# computes all of its gabor filters and returns them in a list
 def get_image_features(img):
 	features = []
 
@@ -165,7 +210,6 @@ def get_image_features(img):
 
 def build_problem(img_kind):
 	subdir = "data/"
-	# img_kind = "happy"
 
 	classes = []
 	data = []
