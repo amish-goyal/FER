@@ -9,15 +9,26 @@ import os.path
 
 def main():
 	
-	img_kind = "surprise"
-	# svm_params = "-t 0 -c 10"
-	# example_make_model(img_kind, svm_params)
+	img_kind = "happy"
+
+	happy_cv_svm_params = "-t 2 -c 2.0 -g 3.0517578125e-05"
+	surprise_cv_svm_params = "-t 2 -c 0.03125 -g 0.0078125"
+	anger_cv_svm_params = "-t 2 -c 0.03125 -g 0.0078125"
+	# example_make_model(img_kind, happy_cv_svm_params)
+
+	# img_kind = "surprise"
+	# example_make_model(img_kind, surprise_cv_svm_params)
+
+	# img_kind = "anger"
+	# example_make_model(img_kind, anger_cv_svm_params)
 
 	# test_model(img_kind)
 
-	# new_test()
+	live_test()
 
-	data_gen(img_kind)
+	# data_gen(img_kind)
+	img_kind = "anger"
+	# test_model(img_kind)
 
 def data_gen(img_kind):
 	subdir = "data/"
@@ -59,7 +70,7 @@ def data_gen(img_kind):
 	
 	output_file.close()
 
-def new_test():
+def live_test():
 	# load all the models
 	print "Loading Models"
 	happy_model = svmutil.svm_load_model('happy.model')
@@ -107,50 +118,57 @@ def new_test():
 				sorted_results = sorted(results.iteritems(), key=operator.itemgetter(1))
 				print sorted_results[len(sorted_results)-1][0]
 
-			print "---------------------"
+				print "---------------------"
 
 def test_model(img_kind):
 	model = svmutil.svm_load_model(img_kind + '.model')
 	print "Finished Loading Model"
 
-	face_cascade = "haarcascades/haarcascade_frontalface_alt.xml"
-	hc = cv.Load(face_cascade)
-	capture = cv.CaptureFromCAM(0)
+	total_count = 0
+	correct_count = 0
+	wrong_count = 0
 
-	while True:
-		img = cv.QueryFrame(capture)
+	subdir = "data/"
+	the_ones = glob.glob(subdir + "f_" + img_kind + "*.jpg")
+	all_of_them = glob.glob(subdir + "f_*_*.jpg")
+	the_others = []
 
-		returned = face.handel_camera_image(img, hc)
-
-		if returned == None:
-			print "No face || more than one face"
-			pass
-		else:
-			print "We have a face"
-			(img_o, img_face) = returned
-
-			# img_face = cv.LoadImageM('data/f_surprise_3.jpg');
-
-			test_data = get_image_features(img_face)
-			
-			predict_input_data = []
-			predict_input_data.append(test_data)
-
-			print "Finished getting image features"
-
-			label = svmutil.svm_predict([1] ,predict_input_data, model)
-
-			print "Finished predicting"
-
-			cv.ShowImage("img",img_face)
-			print label
-			if cv.WaitKey(50) == 27:
-
-				break
+	for x in all_of_them:
+		total_count += 1
+		if the_ones.count(x) < 1:
+			the_others.append(x)
 	
-	cv.DestroyAllWindows()
+	for x in the_ones:
+		img = cv.LoadImageM(x)
+		cv.ShowImage("img", img)
+		cv.WaitKey(10)
+		img_features = get_image_features(img)
+		predict_input_data = []
+		predict_input_data.append(img_features)
+		(val, val_2, val_3) = svmutil.svm_predict([1], predict_input_data, model)
+		if int(val[0]) == 1:
+			print 'correct'
+			correct_count += 1
+		else:
+			wrong_count += 1
 
-
+	for x in the_others:
+		img = cv.LoadImageM(x)
+		cv.ShowImage("img", img)
+		cv.WaitKey(10)
+		img_features = get_image_features(img)
+		predict_input_data = []
+		predict_input_data.append(img_features)
+		(val, val_2, val_3) = svmutil.svm_predict([1], predict_input_data, model)
+		if int(val[0]) == -1:
+			correct_count += 1
+		else:
+			wrong_count += 1
+	
+	print "Total Pictures: " + str(total_count)
+	print "Correct: " + str(correct_count)
+	print "Wrong: " + str(wrong_count)
+	print "Accuracy: " + str(correct_count/float(total_count) * 100) + '%'
 
 # img_kind = "happy"
 # svm_params = "-t 0 -c 10"
