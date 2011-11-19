@@ -7,6 +7,8 @@ import face
 import operator
 import os.path
 
+# python ~/repo/libsvm-3.11/tools/grid.py -log2c -5,5,1 -svmtrain "C:\Users\Yasser\repo\libsvm-3.11\windows\svm-train.exe" -gnuplot "C:\Users\Yasser\repo\gnuplot\bin\gnuplot.exe" -v 10 data/anger.data
+
 def main():
 	
 	img_kind = "happy"
