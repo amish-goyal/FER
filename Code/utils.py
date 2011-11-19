@@ -14,9 +14,9 @@ def main():
 	print 'Starting Main'
 	
 	img_kind = "happy"
-	img_kind = "angry"
-	img_kind = "sad"
-	img_kind = "neutral"
+	img_kind = "anger"
+	img_kind = "surprise"
+	
 
 	happy_cv_svm_params = "-t 2 -c 2.0 -g 3.0517578125e-05"
 	surprise_cv_svm_params = "-t 2 -c 0.03125 -g 0.0078125"
@@ -40,13 +40,13 @@ def main():
 	lda_test(img_kind)
 
 def data_gen(img_kind):
-	subdir = "data/cmu/"
+	subdir = "data/"
 	extension = '.data'
 	file_path = subdir + img_kind + extension
 	output_file = open(file_path, 'w+')
 
-	the_ones = glob.glob(subdir + "*_straight_" + img_kind + "_open.pgm")
-	all_of_them = glob.glob(subdir + "*_straight_*_open.pgm")
+	the_ones = glob.glob(subdir + "f_" + img_kind + "*.jpg")
+	all_of_them = glob.glob(subdir + "f_*_*.jpg")
 	the_others = []
 
 	for x in all_of_them:
@@ -84,13 +84,13 @@ def pca_test(img_kind):
 	from sklearn import datasets
 	from sklearn.decomposition import PCA
 
-	subdir = "data/cmu/"
+	subdir = "data/"
 
 	classes = []
 	data = []
 
-	the_ones = glob.glob(subdir + "*_straight_" + img_kind + "_open.pgm")
-	all_of_them = glob.glob(subdir + "*_straight_*_open.pgm")
+	the_ones = glob.glob(subdir + "f_" + img_kind + "*.jpg")
+	all_of_them = glob.glob(subdir + "f_*_*.jpg")
 	the_others = []
 	target_names = ['happy', 'other']
 
@@ -137,13 +137,13 @@ def lda_test(img_kind):
 	from sklearn import datasets
 	from sklearn.lda import LDA
 
-	subdir = "data/cmu/"
+	subdir = "data/"
 
 	classes = []
 	data = []
 
-	the_ones = glob.glob(subdir + "*_straight_" + img_kind + "_open.pgm")
-	all_of_them = glob.glob(subdir + "*_straight_*_open.pgm")
+	the_ones = glob.glob(subdir + "f_" + img_kind + "*.jpg")
+	all_of_them = glob.glob(subdir + "f_*_*.jpg")
 	the_others = []
 
 	for x in all_of_them:
@@ -180,7 +180,7 @@ def lda_test(img_kind):
 	# for c, i, target_name in zip("rg", [1, -1], target_names):
 	#     pl.scatter(X_r[classes == i, 0], X_r[classes == i, 1], c=c, label=target_name)
 	pl.legend()
-	pl.title('PCA of IRIS dataset')
+	pl.title('LDA of IRIS dataset')
 
 	pl.show()
 
@@ -242,9 +242,9 @@ def test_model(img_kind):
 	correct_count = 0
 	wrong_count = 0
 
-	subdir = "data/cmu/"
-	the_ones = glob.glob(subdir + "*_straight_" + img_kind + "_open.pgm")
-	all_of_them = glob.glob(subdir + "*_straight_*_open.pgm")
+	subdir = "data/"
+	the_ones = glob.glob(subdir + "f_" + img_kind + "*.jpg")
+	all_of_them = glob.glob(subdir + "f_*_*.jpg")
 	the_others = []
 
 	for x in all_of_them:
@@ -341,13 +341,13 @@ def get_image_features(img):
 	return features
 
 def build_problem(img_kind):
-	subdir = "data/cmu/"
+	subdir = "data/"
 
 	classes = []
 	data = []
 
-	the_ones = glob.glob(subdir + "*_straight_" + img_kind + "_open.pgm")
-	all_of_them = glob.glob(subdir + "*_straight_*_open.pgm")
+	the_ones = glob.glob(subdir + "f_" + img_kind + "*.jpg")
+	all_of_them = glob.glob(subdir + "f_*_*.jpg")
 	the_others = []
 
 	for x in all_of_them:
