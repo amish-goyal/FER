@@ -7,20 +7,66 @@ import face
 import operator
 import os.path
 import numpy
+from sklearn.lda import LDA
+from sklearn.decomposition import PCA
 
 # python ~/repo/libsvm-3.11/tools/grid.py -log2c -5,5,1 -svmtrain "C:\Users\Yasser\repo\libsvm-3.11\windows\svm-train.exe" -gnuplot "C:\Users\Yasser\repo\gnuplot\bin\gnuplot.exe" -v 10 data/anger.data
+global pca
+global lda
+global subdir
+
+def fit_pca_and_lda(img_kind):
+	global pca
+	global lda
+	global subdir
+	subdir = 'data/'
+	classes = []
+	data = []
+
+	the_ones = glob.glob(subdir + "f_" + img_kind + "*.jpg")
+	all_of_them = glob.glob(subdir + "f_*_*.jpg")
+	the_others = []
+
+	for x in all_of_them:
+		if the_ones.count(x) < 1:
+			the_others.append(x)
+
+	for x in the_ones:
+		classes.append(1)
+		data.append(get_image_features(cv.LoadImageM(x)))
+
+	for x in the_others:
+		classes.append(-1)
+		data.append(get_image_features(cv.LoadImageM(x)))
+
+	pca = PCA(46, whiten=True)
+	print 'fiting-pca'
+	pca.fit(data)
+
+	lda = LDA(n_components=2)
+	print 'fiting-lda'
+	lda.fit(data, classes)
+	print 'finish'
 
 def main():
 	print 'Starting Main'
 	
 	img_kind = "happy"
 	img_kind = "anger"
-	img_kind = "surprise"
+	# img_kind = "disgust"
+	# img_kind = "neutral"
+	# img_kind = "surprise"
+	# img_kind = "sadness"
 	
-
+	img_kinds = ["happy", "anger", "disgust", "neutral", "surprise", "sadness"]
 	happy_cv_svm_params = "-t 2 -c 2.0 -g 3.0517578125e-05"
 	surprise_cv_svm_params = "-t 2 -c 0.03125 -g 0.0078125"
 	anger_cv_svm_params = "-t 2 -c 0.03125 -g 0.0078125"
+
+	for img_kind in img_kinds:
+		fit_pca_and_lda(img_kind)
+		data_gen(img_kind)
+
 	# example_make_model(img_kind, happy_cv_svm_params)
 
 	# img_kind = "surprise"
@@ -33,11 +79,16 @@ def main():
 
 	# live_test()
 
-	# data_gen(img_kind)
+	
 
 	# test_model(img_kind)
+
 	# pca_test(img_kind)
-	lda_test(img_kind)
+
+	# lda_test(img_kind)
+
+	
+
 
 def data_gen(img_kind):
 	subdir = "data/"
@@ -54,7 +105,7 @@ def data_gen(img_kind):
 			the_others.append(x)
 	
 	for x in the_ones:
-		img_features = get_image_features(cv.LoadImageM(x))
+		img_features = get_image_features(cv.LoadImageM(x), True)
 		class_label = 1
 		#write label in a new line
 		output_file.write(str(class_label))
@@ -66,7 +117,7 @@ def data_gen(img_kind):
 		print x
 	
 	for x in the_others:
-		img_features = get_image_features(cv.LoadImageM(x))
+		img_features = get_image_features(cv.LoadImageM(x), True)
 		class_label = -1
 		#write label in a new line
 		output_file.write(str(class_label))
@@ -82,8 +133,6 @@ def data_gen(img_kind):
 def pca_test(img_kind):
 	import pylab as pl
 	from mpl_toolkits.mplot3d import Axes3D
-	from sklearn import datasets
-	from sklearn.decomposition import PCA
 
 	subdir = "data/"
 
@@ -93,7 +142,6 @@ def pca_test(img_kind):
 	the_ones = glob.glob(subdir + "f_" + img_kind + "*.jpg")
 	all_of_them = glob.glob(subdir + "f_*_*.jpg")
 	the_others = []
-	target_names = ['happy', 'other']
 
 	for x in all_of_them:
 		if the_ones.count(x) < 1:
@@ -107,14 +155,14 @@ def pca_test(img_kind):
 		classes.append(-1)
 		data.append(get_image_features(cv.LoadImageM(x)))
 	
-	pca = PCA(n_components=3)
+	pca = PCA(46, whiten=True)
 	print 'fiting'
 	pca.fit(data)
 	print 'transforming'
 	X_r = pca.transform(data)
 	print '----'
 
-	# print X_r.shape
+	print X_r.shape
 
 	x0 = [x[0] for x in X_r]
 	x1 = [x[1] for x in X_r]
@@ -134,14 +182,13 @@ def pca_test(img_kind):
 	# for c, i, target_name in zip("rg", [1, -1], target_names):
 	#     pl.scatter(X_r[classes == i, 0], X_r[classes == i, 1], c=c, label=target_name)
 	pl.legend()
-	pl.title('PCA of IRIS dataset')
+	pl.title('PCA of dataset')
 
 	pl.show()
 
 def lda_test(img_kind):
 	import pylab as pl
-	from sklearn import datasets
-	from sklearn.lda import LDA
+	
 
 	subdir = "data/"
 
@@ -164,7 +211,7 @@ def lda_test(img_kind):
 		classes.append(-1)
 		data.append(get_image_features(cv.LoadImageM(x)))
 	
-	lda = LDA(n_components=3)
+	lda = LDA(n_components=2)
 	print 'fiting'
 	lda.fit(data, classes)
 	print 'transforming'
@@ -188,7 +235,7 @@ def lda_test(img_kind):
 	# for c, i, target_name in zip("rg", [1, -1], target_names):
 	#     pl.scatter(X_r[classes == i, 0], X_r[classes == i, 1], c=c, label=target_name)
 	pl.legend()
-	pl.title('LDA of IRIS dataset')
+	pl.title('LDA of dataset')
 
 	pl.show()
 
@@ -320,7 +367,7 @@ def get_features(img):
 
 # gets an opencv image
 # computes all of its gabor filters and returns them in a list
-def get_image_features(img):
+def get_image_features(img, reduceP=False):
 	features = []
 
 	kernel_var = 50
@@ -328,6 +375,7 @@ def get_image_features(img):
 
 	gabor_pulsation = 2
 	gabor_phase = 0
+
 	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 	features.extend(get_features(t_img_mag))
 
@@ -346,7 +394,21 @@ def get_image_features(img):
 	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 	features.extend(get_features(t_img_mag))
 
-	return features
+	if not reduceP:
+		return features
+	if reduceP:
+		global pca
+		global lda
+		data = [features]
+
+		transformed_pca = pca.transform(data)
+		transformed_lda = lda.transform(data)
+
+		pca_list = transformed_pca.tolist()[0]
+		lda_list = transformed_lda.tolist()[0]
+		pca_list.extend(lda_list)
+
+		return pca_list
 
 def build_problem(img_kind):
 	subdir = "data/"
@@ -364,11 +426,11 @@ def build_problem(img_kind):
 	
 	for x in the_ones:
 		classes.append(1)
-		data.append(get_image_features(cv.LoadImageM(x)))
+		data.append(get_image_features(cv.LoadImageM(x), True))
 	
 	for x in the_others:
 		classes.append(-1)
-		data.append(get_image_features(cv.LoadImageM(x)))
+		data.append(get_image_features(cv.LoadImageM(x), True))
 
 	prob = svm.svm_problem(classes, data)
 
