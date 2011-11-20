@@ -81,6 +81,7 @@ def data_gen(img_kind):
 
 def pca_test(img_kind):
 	import pylab as pl
+	from mpl_toolkits.mplot3d import Axes3D
 	from sklearn import datasets
 	from sklearn.decomposition import PCA
 
@@ -106,22 +107,27 @@ def pca_test(img_kind):
 		classes.append(-1)
 		data.append(get_image_features(cv.LoadImageM(x)))
 	
-	pca = PCA(n_components=2)
+	pca = PCA(n_components=3)
 	print 'fiting'
 	pca.fit(data)
 	print 'transforming'
 	X_r = pca.transform(data)
 	print '----'
 
+	# print X_r.shape
+
 	x0 = [x[0] for x in X_r]
 	x1 = [x[1] for x in X_r]
+	x2 = [x[2] for x in X_r]
 
-	pl.figure()
+	fig = pl.figure()
+
+	ax = Axes3D(fig)
 	for i in xrange(0,len(x0)):
 		if classes[i] == 1:
-			pl.scatter(x0[i], x1[i], c = 'r')
+			ax.scatter(x0[i], x1[i], x2[i], c = 'r')
 		else:
-			pl.scatter(x0[i], x1[i], c = 'b')
+			ax.scatter(x0[i], x1[i], x2[i], c = 'b')
 	
 
 	
@@ -158,12 +164,14 @@ def lda_test(img_kind):
 		classes.append(-1)
 		data.append(get_image_features(cv.LoadImageM(x)))
 	
-	lda = LDA(n_components=2)
+	lda = LDA(n_components=3)
 	print 'fiting'
 	lda.fit(data, classes)
 	print 'transforming'
 	X_r = lda.transform(data)
 	print '----'
+
+	print X_r.shape
 
 	x0 = [x[0] for x in X_r]
 	x1 = [x[1] for x in X_r]
