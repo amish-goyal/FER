@@ -8,18 +8,21 @@ import operator
 import os.path
 import numpy
 from sklearn.lda import LDA
-from sklearn.decomposition import PCA
+from sklearn.decomposition import RandomizedPCA as PCA
 
 # python ~/repo/libsvm-3.11/tools/grid.py -log2c -5,5,1 -svmtrain "C:\Users\Yasser\repo\libsvm-3.11\windows\svm-train.exe" -gnuplot "C:\Users\Yasser\repo\gnuplot\bin\gnuplot.exe" -v 10 data/anger.data
 global pca
+pca = {}
 global lda
+lda = {}
 global subdir
+subdir = 'data/'
 
 def fit_pca_and_lda(img_kind):
+	print img_kind
 	global pca
 	global lda
 	global subdir
-	subdir = 'data/'
 	classes = []
 	data = []
 
@@ -39,33 +42,35 @@ def fit_pca_and_lda(img_kind):
 		classes.append(-1)
 		data.append(get_image_features(cv.LoadImageM(x)))
 
-	pca = PCA(46, whiten=True)
+	c_pca = PCA(n_components=30)
 	print 'fiting-pca'
-	pca.fit(data)
+	c_pca.fit(data)
 
-	lda = LDA(n_components=2)
+	c_lda = LDA(n_components=2)
 	print 'fiting-lda'
-	lda.fit(data, classes)
+	c_lda.fit(data, classes)
 	print 'finish'
+
+	pca[img_kind] = c_pca
+	lda[img_kind] = c_lda
 
 def main():
 	print 'Starting Main'
 	
-	img_kind = "happy"
-	img_kind = "anger"
-	# img_kind = "disgust"
-	# img_kind = "neutral"
-	# img_kind = "surprise"
-	# img_kind = "sadness"
-	
-	img_kinds = ["happy", "anger", "disgust", "neutral", "surprise", "sadness"]
-	happy_cv_svm_params = "-t 2 -c 2.0 -g 3.0517578125e-05"
+	img_kinds = ["happy", "anger", "neutral", "surprise"]
+	happy_cv_svm_params = "-t 2 -c 0.03125 -g 0.0078125"
 	surprise_cv_svm_params = "-t 2 -c 0.03125 -g 0.0078125"
 	anger_cv_svm_params = "-t 2 -c 0.03125 -g 0.0078125"
+	disgust_cv_svm_params = "-t 2 -c 0.03125 -g 0.0078125"
+
+	svm_params = "-t 0 -c 10"
 
 	for img_kind in img_kinds:
+		print 'fiting all PCAs and LDAs'
 		fit_pca_and_lda(img_kind)
-		data_gen(img_kind)
+		print '------------------------'
+		# data_gen(img_kind)
+		# example_make_model(img_kind, svm_params)
 
 	# example_make_model(img_kind, happy_cv_svm_params)
 
@@ -75,20 +80,16 @@ def main():
 	# img_kind = "anger"
 	# example_make_model(img_kind, anger_cv_svm_params)
 
+	# img_kind = "neutral"
 	# test_model(img_kind)
 
-	# live_test()
-
-	
+	live_test()
 
 	# test_model(img_kind)
 
 	# pca_test(img_kind)
 
-	# lda_test(img_kind)
-
-	
-
+	# lda_test(img_kinds[0])
 
 def data_gen(img_kind):
 	subdir = "data/"
@@ -105,7 +106,7 @@ def data_gen(img_kind):
 			the_others.append(x)
 	
 	for x in the_ones:
-		img_features = get_image_features(cv.LoadImageM(x), True)
+		img_features = get_image_features(cv.LoadImageM(x), True, img_kind)
 		class_label = 1
 		#write label in a new line
 		output_file.write(str(class_label))
@@ -117,7 +118,7 @@ def data_gen(img_kind):
 		print x
 	
 	for x in the_others:
-		img_features = get_image_features(cv.LoadImageM(x), True)
+		img_features = get_image_features(cv.LoadImageM(x), True, img_kind)
 		class_label = -1
 		#write label in a new line
 		output_file.write(str(class_label))
@@ -240,14 +241,14 @@ def lda_test(img_kind):
 	pl.show()
 
 def live_test():
+	subdir = 'data/'
+	img_kinds = ["happy", "anger", "neutral", "surprise"]
+	models = {}
 	# load all the models
 	print "Loading Models"
-	happy_model = svmutil.svm_load_model('happy.model')
-	print 1
-	surprise_model = svmutil.svm_load_model('surprise.model')
-	print 2
-	anger_model = svmutil.svm_load_model('anger.model')
-	print 3
+	for img_kind in img_kinds:
+		print 'loading for: ' + img_kind
+		models[img_kind] = svmutil.svm_load_model(subdir + img_kind + '.model')
 	print "---------------------"
 
 	print "Loading cascade"
@@ -274,30 +275,32 @@ def live_test():
 				(img_o, img_face) = returned
 				cv.ShowImage("face",img_face)
 				# get features from the face
-				test_data = get_image_features(img_face)
-				predict_input_data = []
-				predict_input_data.append(test_data)
+				results = {}
+				for img_kind in img_kinds:
+					test_data = get_image_features(img_face, True, img_kind)
+					predict_input_data = []
+					predict_input_data.append(test_data)
 
-				# do svm query for all models
-				(val, val_2, happy_label) = svmutil.svm_predict([1] ,predict_input_data, happy_model)
-				(val, val_2, surprise_label) = svmutil.svm_predict([1] ,predict_input_data, surprise_model)
-				(val, val_2, anger_label) = svmutil.svm_predict([1] ,predict_input_data, anger_model)
+					# do svm query
+					(val, val_2, label) = svmutil.svm_predict([1] ,predict_input_data, models[img_kind])
+					results[img_kind] = label[0][0]
+					print img_kind + str(results[img_kind])
 
-				results = {'happy': happy_label[0][0], 'surprise': surprise_label[0][0], 'anger': anger_label[0][0]}
 				sorted_results = sorted(results.iteritems(), key=operator.itemgetter(1))
 				print sorted_results[len(sorted_results)-1][0]
 
 				print "---------------------"
 
 def test_model(img_kind):
-	model = svmutil.svm_load_model(img_kind + '.model')
+	subdir = "data/"
+	model = svmutil.svm_load_model(subdir + img_kind + '.model')
 	print "Finished Loading Model"
 
 	total_count = 0
 	correct_count = 0
 	wrong_count = 0
 
-	subdir = "data/"
+	
 	the_ones = glob.glob(subdir + "f_" + img_kind + "*.jpg")
 	all_of_them = glob.glob(subdir + "f_*_*.jpg")
 	the_others = []
@@ -311,7 +314,7 @@ def test_model(img_kind):
 		img = cv.LoadImageM(x)
 		cv.ShowImage("img", img)
 		cv.WaitKey(10)
-		img_features = get_image_features(img)
+		img_features = get_image_features(img, True, img_kind)
 		predict_input_data = []
 		predict_input_data.append(img_features)
 		(val, val_2, val_3) = svmutil.svm_predict([1], predict_input_data, model)
@@ -325,7 +328,7 @@ def test_model(img_kind):
 		img = cv.LoadImageM(x)
 		cv.ShowImage("img", img)
 		cv.WaitKey(10)
-		img_features = get_image_features(img)
+		img_features = get_image_features(img, True, img_kind)
 		predict_input_data = []
 		predict_input_data.append(img_features)
 		(val, val_2, val_3) = svmutil.svm_predict([1], predict_input_data, model)
@@ -342,6 +345,7 @@ def test_model(img_kind):
 # img_kind = "happy"
 # svm_params = "-t 0 -c 10"
 def example_make_model(img_kind, svm_params):
+	subdir = "data/"
 	problem = build_problem(img_kind)
 	print "Prob built"
 
@@ -351,7 +355,7 @@ def example_make_model(img_kind, svm_params):
 	problem_model = svmutil.svm_train(problem, param)
 	print "Model built"
 
-	svmutil.svm_save_model(img_kind + '.model', problem_model)
+	svmutil.svm_save_model(subdir + img_kind + '.model', problem_model)
 	print "Done"
 
 # gets an opencv image
@@ -367,7 +371,7 @@ def get_features(img):
 
 # gets an opencv image
 # computes all of its gabor filters and returns them in a list
-def get_image_features(img, reduceP=False):
+def get_image_features(img, reduceP=False, img_kind = None):
 	features = []
 
 	kernel_var = 50
@@ -375,22 +379,91 @@ def get_image_features(img, reduceP=False):
 
 	gabor_pulsation = 2
 	gabor_phase = 0
-
 	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 	features.extend(get_features(t_img_mag))
 
-	gabor_pulsation = 10
+	gabor_pulsation = 4
+	gabor_phase = 0
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 6
 	gabor_phase = 0
 	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 	features.extend(get_features(t_img_mag))
 	
 	gabor_pulsation = 2
-	gabor_phase = 100
+	gabor_phase = 30
 	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 	features.extend(get_features(t_img_mag))
 
-	gabor_pulsation = 10
-	gabor_phase = 100
+	gabor_pulsation = 4
+	gabor_phase = 30
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 6
+	gabor_phase = 30
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 2
+	gabor_phase = 60
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 4
+	gabor_phase = 60
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 6
+	gabor_phase = 60
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 2
+	gabor_phase = 90
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 4
+	gabor_phase = 90
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 6
+	gabor_phase = 90
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 2
+	gabor_phase = 120
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 4
+	gabor_phase = 120
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 6
+	gabor_phase = 120
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 2
+	gabor_phase = 150
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 4
+	gabor_phase = 150
+	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+	features.extend(get_features(t_img_mag))
+
+	gabor_pulsation = 6
+	gabor_phase = 150
 	(t_img_mag, t_img) = gabor.Process(img, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 	features.extend(get_features(t_img_mag))
 
@@ -401,12 +474,12 @@ def get_image_features(img, reduceP=False):
 		global lda
 		data = [features]
 
-		transformed_pca = pca.transform(data)
-		transformed_lda = lda.transform(data)
+		transformed_pca = pca[img_kind].transform(data)
+		transformed_lda = lda[img_kind].transform(data)
 
 		pca_list = transformed_pca.tolist()[0]
 		lda_list = transformed_lda.tolist()[0]
-		pca_list.extend(lda_list)
+		# pca_list.extend(lda_list)
 
 		return pca_list
 
@@ -426,11 +499,11 @@ def build_problem(img_kind):
 	
 	for x in the_ones:
 		classes.append(1)
-		data.append(get_image_features(cv.LoadImageM(x), True))
+		data.append(get_image_features(cv.LoadImageM(x), True, img_kind))
 	
 	for x in the_others:
 		classes.append(-1)
-		data.append(get_image_features(cv.LoadImageM(x), True))
+		data.append(get_image_features(cv.LoadImageM(x), True, img_kind))
 
 	prob = svm.svm_problem(classes, data)
 
