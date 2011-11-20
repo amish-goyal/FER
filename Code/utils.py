@@ -63,14 +63,20 @@ def main():
 	anger_cv_svm_params = "-t 2 -c 0.03125 -g 0.0078125"
 	disgust_cv_svm_params = "-t 2 -c 0.03125 -g 0.0078125"
 
-	svm_params = "-t 0 -c 10"
-
+	svm_params = "-t 0 -c 3"
+	print 'fiting all PCAs and LDAs'
 	for img_kind in img_kinds:
-		print 'fiting all PCAs and LDAs'
 		fit_pca_and_lda(img_kind)
 		print '------------------------'
-		# data_gen(img_kind)
-		# example_make_model(img_kind, svm_params)
+	
+	print '++++++++++++++++++++++++++++'
+
+	train_test()
+
+	# for img_kind in img_kinds:
+	# 	print '________' + img_kind + '________'
+	# 	print '_________________________________'
+	# 	test_model(img_kind)
 
 	# example_make_model(img_kind, happy_cv_svm_params)
 
@@ -83,7 +89,7 @@ def main():
 	# img_kind = "neutral"
 	# test_model(img_kind)
 
-	live_test()
+	# live_test()
 
 	# test_model(img_kind)
 
@@ -342,6 +348,69 @@ def test_model(img_kind):
 	print "Wrong: " + str(wrong_count)
 	print "Accuracy: " + str(correct_count/float(total_count) * 100) + '%'
 
+# This function trains some models with train set
+# The tries to test them with test set
+def train_test():
+	train_subdir = "data/train/"
+	test_subdir = "data/test/"
+	img_kinds = ["happy", "anger", "neutral", "surprise"]
+	models = {}
+	params = "-t 0 -c 3"
+	svm_params = {	"happy": params,
+					"anger": params,
+					"neutral": params,
+					"surprise": params}
+
+	#train the models
+	print 'BUILDING TRAIN MODELS'
+	for img_kind in img_kinds:
+		print "\t" + img_kind
+		problem = build_problem(img_kind, train_subdir)
+		param = svm.svm_parameter(svm_params[img_kind])
+		models[img_kind] = svmutil.svm_train(problem, param)
+	print '================================'
+
+	#for each image in test set let's see what is the answe
+	total_count = 0
+	correct_count = 0
+	wrong_count = 0
+
+	print 'TESTING MODELS'
+	for img_kind in img_kinds:
+		images = glob.glob(test_subdir + "f_" + img_kind + "*.jpg")
+		for image in images:
+			print "\t" + image
+			image_data = cv.LoadImage(image)
+			
+			# Let's see what are the results from the models
+			results = {}
+			for kind in img_kinds:
+				test_data = get_image_features(image_data, True, kind)
+				predict_input_data = []
+				predict_input_data.append(test_data)
+
+				# do svm query
+				(val, val_2, label) = svmutil.svm_predict([1] ,predict_input_data, models[kind])
+				results[kind] = label[0][0]
+			
+			sorted_results = sorted(results.iteritems(), key=operator.itemgetter(1))
+			result = sorted_results[len(sorted_results)-1][0]
+
+			total_count += 1
+			if result == img_kind:
+				print 'YES :' + result
+				correct_count += 1
+			else:
+				print 'NO  :' + result
+				print sorted_results
+				wrong_count += 1
+			print '-----------------------'
+	print '================================'
+	print "Total Pictures: " + str(total_count)
+	print "Correct: " + str(correct_count)
+	print "Wrong: " + str(wrong_count)
+	print "Accuracy: " + str(correct_count/float(total_count) * 100)
+	
 # img_kind = "happy"
 # svm_params = "-t 0 -c 10"
 def example_make_model(img_kind, svm_params):
@@ -481,9 +550,9 @@ def get_image_features(img, reduceP=False, img_kind = None):
 		lda_list = transformed_lda.tolist()[0]
 		# pca_list.extend(lda_list)
 
-		return pca_list
+		return lda_list
 
-def build_problem(img_kind):
+def build_problem(img_kind, subdir = "data/"):
 	subdir = "data/"
 
 	classes = []
