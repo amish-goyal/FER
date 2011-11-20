@@ -46,23 +46,110 @@ def main():
 			cv.ShowImage("normalized", img_r)
 
 			if show_gabor:
-				gabor_phase = 100
-				gabor_pulsation = 5
+				kernel_var = 50
+				gabor_psi = 90
+
+				gabor_pulsation = 2
+				gabor_phase = 0
 				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 				cv.ShowImage("Gabor1", img_g_mag)
 
-				gabor_pulsation = 2
+				gabor_pulsation = 4
+				gabor_phase = 0
 				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 				cv.ShowImage("Gabor2", img_g_mag)
 
-				gabor_pulsation = 8
+				gabor_pulsation = 6
+				gabor_phase = 0
 				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 				cv.ShowImage("Gabor3", img_g_mag)
 
-				gabor_pulsation = 10
+				# ////////////////////////////////////////
+
+				gabor_pulsation = 2
+				gabor_phase = 30
 				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
 				cv.ShowImage("Gabor4", img_g_mag)
 
+				gabor_pulsation = 4
+				gabor_phase = 30
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor5", img_g_mag)
+
+				gabor_pulsation = 6
+				gabor_phase = 30
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor6", img_g_mag)
+
+				# ////////////////////////////////////////
+
+				gabor_pulsation = 2
+				gabor_phase = 60
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor7", img_g_mag)
+
+				gabor_pulsation = 4
+				gabor_phase = 60
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor8", img_g_mag)
+
+				gabor_pulsation = 6
+				gabor_phase = 60
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor9", img_g_mag)
+
+				# ////////////////////////////////////////
+
+				gabor_pulsation = 2
+				gabor_phase = 90
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor10", img_g_mag)
+
+				gabor_pulsation = 4
+				gabor_phase = 90
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor11", img_g_mag)
+
+				gabor_pulsation = 6
+				gabor_phase = 90
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor12", img_g_mag)
+
+				# ////////////////////////////////////////
+
+				gabor_pulsation = 2
+				gabor_phase = 120
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor13", img_g_mag)
+
+				gabor_pulsation = 4
+				gabor_phase = 120
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor14", img_g_mag)
+
+				gabor_pulsation = 6
+				gabor_phase = 120
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor15", img_g_mag)
+
+				# ////////////////////////////////////////
+
+				gabor_pulsation = 2
+				gabor_phase = 150
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor16", img_g_mag)
+
+				gabor_pulsation = 4
+				gabor_phase = 150
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor17", img_g_mag)
+
+				gabor_pulsation = 6
+				gabor_phase = 150
+				(img_g_mag, img_g) = gabor.Process(img_r, kernel_var, gabor_pulsation, gabor_phase, gabor_psi)
+				cv.ShowImage("Gabor18", img_g_mag)
+
+				# ////////////////////////////////////////
 
 		key_pressed = cv.WaitKey(1)
 		# print "key pressed: " + str(key_pressed)
