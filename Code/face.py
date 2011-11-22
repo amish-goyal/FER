@@ -33,7 +33,7 @@ def main():
 	print "7: surprise"
 
 	while True:
-		img = cv.QueryFrame(capture)
+		img = cv.LoadImage("data/o_happy_24.jpg")
 		
 		returned = handel_camera_image(img, hc)
 

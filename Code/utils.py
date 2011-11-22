@@ -23,6 +23,8 @@ def fit_pca_and_lda(img_kind):
 	global pca
 	global lda
 	global subdir
+
+	subdir = "data/train/"
 	classes = []
 	data = []
 
@@ -42,16 +44,16 @@ def fit_pca_and_lda(img_kind):
 		classes.append(-1)
 		data.append(get_image_features(cv.LoadImageM(x)))
 
-	c_pca = PCA(n_components=30)
-	print 'fiting-pca'
-	c_pca.fit(data)
+	# c_pca = PCA(n_components=30)
+	# print 'fiting-pca'
+	# c_pca.fit(data)
 
 	c_lda = LDA(n_components=2)
 	print 'fiting-lda'
 	c_lda.fit(data, classes)
 	print 'finish'
 
-	pca[img_kind] = c_pca
+	# pca[img_kind] = c_pca
 	lda[img_kind] = c_lda
 
 def main():
@@ -93,7 +95,7 @@ def main():
 
 	# test_model(img_kind)
 
-	# pca_test(img_kind)
+	# pca_test(img_kinds[0])
 
 	# lda_test(img_kinds[0])
 
@@ -173,16 +175,14 @@ def pca_test(img_kind):
 
 	x0 = [x[0] for x in X_r]
 	x1 = [x[1] for x in X_r]
-	x2 = [x[2] for x in X_r]
 
-	fig = pl.figure()
+	pl.figure()
 
-	ax = Axes3D(fig)
 	for i in xrange(0,len(x0)):
 		if classes[i] == 1:
-			ax.scatter(x0[i], x1[i], x2[i], c = 'r')
+			pl.scatter(x0[i], x1[i], c = 'r')
 		else:
-			ax.scatter(x0[i], x1[i], x2[i], c = 'b')
+			pl.scatter(x0[i], x1[i], c = 'b')
 	
 
 	
@@ -543,10 +543,10 @@ def get_image_features(img, reduceP=False, img_kind = None):
 		global lda
 		data = [features]
 
-		transformed_pca = pca[img_kind].transform(data)
+		# transformed_pca = pca[img_kind].transform(data)
 		transformed_lda = lda[img_kind].transform(data)
 
-		pca_list = transformed_pca.tolist()[0]
+		# pca_list = transformed_pca.tolist()[0]
 		lda_list = transformed_lda.tolist()[0]
 		# pca_list.extend(lda_list)
 
