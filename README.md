@@ -1,5 +1,7 @@
 #FER : Facial Expression Recognition
 
+This was my Bs. Final Project.
+
 ...
 
 ##Dependencies
